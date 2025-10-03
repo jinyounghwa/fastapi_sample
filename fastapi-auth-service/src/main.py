@@ -1,5 +1,6 @@
 from fastapi import FastAPI
-from app.database import engine
+from app.database import engine, Base
+from app.models import Post
 
 app = FastAPI()
 
@@ -14,4 +15,8 @@ async def ping_db():
             return {"status": "connected"}
     except Exception as e:
         return {"status": "error", "detail": str(e)}
+    
+@app.on_event("startup")
+def init_db():
+    Base.metadata.create_all(bind=engine)
             
