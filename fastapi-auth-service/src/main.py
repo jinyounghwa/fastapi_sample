@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from app.database import engine, Base
-from app.models import Post
+from src.app.models import post  # 모델 임포트
 
 app = FastAPI()
 
