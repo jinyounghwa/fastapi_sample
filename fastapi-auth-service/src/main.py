@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from app.database import engine
+from src.app.database import engine
 
 app = FastAPI()
 
