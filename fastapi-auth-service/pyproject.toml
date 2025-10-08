@@ -13,5 +13,22 @@ sqlalchemy = "^2.0.43"
 
 
 [build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+requires = ["pdm-backend"]
+build-backend = "pdm.backend"
+
+
+[project]
+authors = [
+    {name = "Your Name", email = "you@example.com"},
+]
+requires-python = "<4.0,>=3.12"
+dependencies = [
+    "fastapi<1.0.0,>=0.118.0",
+    "uvicorn<1.0.0,>=0.37.0",
+    "sqlalchemy<3.0.0,>=2.0.43",
+    "passlib[bcrypt]>=1.7.4",
+]
+name = "fastapi-auth-service"
+version = "0.1.0"
+description = ""
+readme = "README.md"

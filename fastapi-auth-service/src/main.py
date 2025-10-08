@@ -3,6 +3,7 @@ from typing import List
 from src.app.database import engine, Base
 from src.app.models import post
 from src.app.service.post_service import PostService, get_post_service
+from src.app.models import user
   # 스키마 임포트
 
 app = FastAPI(
@@ -12,6 +13,10 @@ app = FastAPI(
     docs_url="/docs",
     redoc_url="/redoc",
 )
+
+app.include_router(user.router, tags=["User"])
+#  게시글 관련 API 라우터
+# app.include_router(post.router,tags=["Posts"])
 
 @app.get("/")
 def health_check():
