@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from app.models.user import User
+from app.models import User
 from app.shemas.user import UserCreate
 from app.utils.security import hash_password
 from sqlalchemy import select
@@ -7,10 +7,10 @@ from fastapi import Depends
 from app.database import get_db
 
 class UserService:
-    def __init__(self, db: Session):
+    def __init__(self, db: Session = Depends(get_db)):
         self.db = db
     
-    def crate_user(self, user:UserCreate):
+    def create_user(self, user:UserCreate):
         hashed_password = hash_password(user.password)
         db_user = User(email=user.email, username=user.username, password=hashed_password)
         self.db.add(db_user)

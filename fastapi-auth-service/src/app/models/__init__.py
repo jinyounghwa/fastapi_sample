@@ -1,3 +1,2 @@
-from src.app.models.post import Post
-
-__all__ = ["Post"]
+from .user import User
+from .post import Post

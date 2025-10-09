@@ -1,8 +1,8 @@
 from sqlalchemy.orm import Session
-from src.app.models.post import PostCreate
-from src.app.models import Post
+from app.shemas.post import PostCreate
+from app.models import Post
 from fastapi import Depends
-from src.app.database import get_db
+from app.database import get_db
 from sqlalchemy import select
 
 class PostService:

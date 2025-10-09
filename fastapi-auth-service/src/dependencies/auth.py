@@ -1,24 +1,44 @@
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from fastapi import Depends, HTTPException
-from app.service.auth_service import AuthService, get_auth_service
-from app.utils.auth import decode_access_token
+from fastapi import Depends, HTTPException, status
+from fastapi.security import OAuth2PasswordBearer
+from jose import JWTError, jwt
 from sqlalchemy.orm import Session
+from starlette.authentication import UnauthenticatedUser, AuthCredentials
+from app.database import SessionLocal
 
-bearer_scheme = HTTPBearer()
+from app.models.user import User
+from app.utils.auth import SECRET_KEY, ALGORITHM
+from app.utils.redis import get_email_by_token
 
-def get_current_user(
-    credentials: HTTPAuthorizationCredentials = Depends(bearer_scheme),
-    db: Session = Depends(get_db)
-):
-    token = credentials.credentials
-    payload = decode_access_token(token)
-    if payload is None:
-        raise HTTPException(status_code=401, detail="Invalid token", headers={"WWW-Authenticate": "Bearer"})
-    username = payload.get("username")
-    if username is None:
-        raise HTTPException(status_code=401, detail="Invalid token", headers={"WWW-Authenticate": "Bearer"})
-    query = select(User).where(User.username == username)
-    user = db.execute(query).scalar_one_or_none()
-    if user is None:
-        raise HTTPException(status_code=404, detail="User not found")
-    return user
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/login")
+
+class JWTAuthBackend:
+    async def authenticate(self, conn):
+        if "Authorization" not in conn.headers:
+            return
+
+        auth = conn.headers["Authorization"]
+        try:
+            scheme, token = auth.split()
+            if scheme.lower() != 'bearer':
+                return
+
+            # Check if token is in Redis
+            if get_email_by_token(token) is None:
+                return
+
+            payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+            email: str = payload.get("sub")
+            if email is None:
+                return
+        except (ValueError, JWTError):
+            # Token is invalid
+            return
+
+        db = SessionLocal()
+        user = db.query(User).filter(User.email == email).first()
+        db.close()
+
+        if user is None:
+            return
+
+        return AuthCredentials(["authenticated"]), user
