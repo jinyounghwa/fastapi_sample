@@ -4,6 +4,8 @@ from src.app.database import engine, Base
 from src.app.models import post
 from src.app.service.post_service import PostService, get_post_service
 from src.app.models import user
+from src.app.service.auth_service import AuthService, get_auth_service
+from src.app.apis import auth
   # 스키마 임포트
 
 app = FastAPI(
@@ -15,6 +17,7 @@ app = FastAPI(
 )
 
 app.include_router(user.router, tags=["User"])
+app.include_router(auth.router, tags=["auth"])
 #  게시글 관련 API 라우터
 # app.include_router(post.router,tags=["Posts"])
 
